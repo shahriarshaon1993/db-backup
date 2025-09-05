@@ -17,7 +17,7 @@ class StoreSystemRequest extends FormRequest
             'name' => ['required', 'string', 'min:3', 'max:30', 'unique:systems,name'],
             'db_name' => ['required', 'string', 'min:3', 'max:30'],
             'db_host' => ['nullable', 'string', 'min:3', 'max:30'],
-            'db_port' => ['nullable', 'string', 'min:3', 'max:30'],
+            'db_port' => ['nullable', 'integer'],
             'db_username' => ['required', 'string', 'min:3', 'max:30'],
             'db_password' => ['required', 'string', 'min:3', 'max:30'],
         ];

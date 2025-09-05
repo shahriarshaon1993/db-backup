@@ -1,14 +1,15 @@
 <script setup lang="ts">
-import SystemController from '@/actions/App/Http/Controllers/SystemController';
 import { SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
+import { store } from '@/routes/systems';
 
 import InputError from '@/components/InputError.vue';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { urlIsActive } from '@/lib/utils';
 import { type NavItem } from '@/types';
-import { Form, Link, usePage } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
 import { MonitorCog, Plus } from 'lucide-vue-next';
+import { toast } from 'vue-sonner';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -21,12 +22,42 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
+import { useForm } from '@inertiajs/vue3';
+import { ref } from 'vue';
 
 defineProps<{
     items: NavItem[];
 }>();
 
 const page = usePage();
+
+const open = ref(false);
+const form = useForm({
+    name: '',
+    db_host: '127.0.0.1',
+    db_port: 3306,
+    db_username: '',
+    db_password: '',
+    db_name: '',
+});
+
+const onSubmit = () => {
+    form.submit(store(), {
+        preserveScroll: true,
+        onSuccess: () => {
+            form.reset();
+            (form.clearErrors(), (open.value = false));
+
+            toast('Success!', {
+                description: page.props.flash.success,
+                action: {
+                    label: 'Undo',
+                    onClick: () => console.log('Undo'),
+                },
+            });
+        },
+    });
+};
 </script>
 
 <template>
@@ -46,7 +77,7 @@ const page = usePage();
         <SidebarMenu>
             <SidebarMenuItem>
                 <SidebarMenuButton>
-                    <Dialog>
+                    <Dialog v-model:open="open">
                         <DialogTrigger as-child>
                             <button type="button" class="flex w-full cursor-pointer items-center justify-between">
                                 <div class="flex items-center gap-2">
@@ -57,14 +88,7 @@ const page = usePage();
                             </button>
                         </DialogTrigger>
                         <DialogContent>
-                            <Form
-                                v-bind="SystemController.store.form()"
-                                :options="{
-                                    preserveScroll: true,
-                                }"
-                                class="space-y-6"
-                                v-slot="{ errors, processing, reset, clearErrors }"
-                            >
+                            <form @submit.prevent="onSubmit" class="space-y-3">
                                 <DialogHeader>
                                     <DialogTitle>Add a system</DialogTitle>
                                     <DialogDescription>Add a new system with there secret informations.</DialogDescription>
@@ -80,52 +104,40 @@ const page = usePage();
                                             autofocus
                                             :tabindex="1"
                                             autocomplete="name"
-                                            name="name"
+                                            v-model="form.name"
                                             placeholder="System name"
                                         />
-                                        <InputError :message="errors.name" />
+                                        <InputError :message="form.errors.name" />
                                     </div>
 
                                     <div class="grid gap-2">
                                         <Label for="db_name">DB name</Label>
-                                        <Input id="db_name" type="text" name="db_name" placeholder="DB name" />
-                                        <InputError :message="errors.db_name" />
+                                        <Input id="db_name" type="text" v-model="form.db_name" placeholder="DB name" />
+                                        <InputError :message="form.errors.db_name" />
                                     </div>
 
                                     <div class="grid gap-2">
                                         <Label for="db_host">DB Host</Label>
-                                        <Input
-                                            id="db_host"
-                                            type="text"
-                                            name="db_host"
-                                            placeholder="DB host"
-                                            default-value="127.0.0.1"
-                                        />
-                                        <InputError :message="errors.db_host" />
+                                        <Input id="db_host" type="text" v-model="form.db_host" placeholder="DB host" />
+                                        <InputError :message="form.errors.db_host" />
                                     </div>
 
                                     <div class="grid gap-2">
                                         <Label for="db_port">DB port</Label>
-                                        <Input
-                                            id="db_port"
-                                            type="text"
-                                            name="db_port"
-                                            placeholder="DB port"
-                                            default-value="3306"
-                                        />
-                                        <InputError :message="errors.db_port" />
+                                        <Input id="db_port" type="text" v-model="form.db_port" placeholder="DB port" />
+                                        <InputError :message="form.errors.db_port" />
                                     </div>
 
                                     <div class="grid gap-2">
                                         <Label for="db_username">DB username</Label>
-                                        <Input id="db_username" type="text" name="db_username" placeholder="DB username" />
-                                        <InputError :message="errors.db_username" />
+                                        <Input id="db_username" type="text" v-model="form.db_username" placeholder="DB username" />
+                                        <InputError :message="form.errors.db_username" />
                                     </div>
 
                                     <div class="grid gap-2">
                                         <Label for="db_password">DB password</Label>
-                                        <Input id="db_password" type="text" name="db_password" placeholder="DB password" />
-                                        <InputError :message="errors.db_password" />
+                                        <Input id="db_password" type="text" v-model="form.db_password" placeholder="DB password" />
+                                        <InputError :message="form.errors.db_password" />
                                     </div>
                                 </div>
 
@@ -134,9 +146,11 @@ const page = usePage();
                                         <Button
                                             variant="secondary"
                                             @click="
-                                                () => {
-                                                    clearErrors();
-                                                    reset();
+                                                {
+                                                    form.reset();
+                                                    form.clearErrors();
+
+                                                    open = false;
                                                 }
                                             "
                                         >
@@ -144,9 +158,9 @@ const page = usePage();
                                         </Button>
                                     </DialogClose>
 
-                                    <Button type="submit" :disabled="processing"> Save </Button>
+                                    <Button type="submit" :disabled="form.processing"> Save </Button>
                                 </DialogFooter>
-                            </Form>
+                            </form>
                         </DialogContent>
                     </Dialog>
                 </SidebarMenuButton>

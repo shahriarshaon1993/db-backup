@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\CreateSystem;
 use App\Http\Requests\StoreSystemRequest;
-use Illuminate\Http\Request;
 
 class SystemController
 {
-    public function store(StoreSystemRequest $request)
+    public function store(StoreSystemRequest $request, CreateSystem $action)
     {
-        $attributes = $request->validated();
+        $action->handle($request->validated());
 
-        dd($attributes);
+        return back()->with('success', 'New system created successfully!');
     }
 }
