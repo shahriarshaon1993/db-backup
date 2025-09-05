@@ -4,14 +4,17 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import { dashboard } from '@/routes';
 import { backup } from '@/routes/systems';
 import { type BreadcrumbItem } from '@/types';
-import { Head, router } from '@inertiajs/vue3';
+import { Head, router, usePage } from '@inertiajs/vue3';
 import { Download } from 'lucide-vue-next';
+import { toast } from 'vue-sonner';
 
 interface Props {
     system: Object;
 }
 
 const props = defineProps<Props>();
+
+const page = usePage();
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -21,7 +24,26 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 const onBackup = () => {
-    router.get(backup({ system: props.system.slug }));
+    router.get(
+        backup({ system: props.system.slug }),
+        {},
+        {
+            preserveScroll: true,
+            onSuccess: () => {
+                toast('Success!', {
+                    description: page.props.flash.success,
+                    action: {
+                        label: 'Undo',
+                        onClick: () => console.log('Undo'),
+                    },
+                });
+            },
+            onError: (errors) => {
+                toast.error('Backup failed!');
+                console.error(errors);
+            },
+        },
+    );
 };
 </script>
 

@@ -17,7 +17,7 @@ return new class extends Migration {
             $table->string('db_host')->default('127.0.0.1');
             $table->integer('db_port')->default(3306);
             $table->string('db_username');
-            $table->string('db_password');
+            $table->string('db_password')->nullable();
             $table->string('db_name');
             $table->foreignId('created_by')->constrained('users');
             $table->timestamps();
