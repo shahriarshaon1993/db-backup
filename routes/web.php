@@ -13,6 +13,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
 
+    Route::get('systems/{system}/backup', [SystemController::class, 'backup'])
+        ->name('systems.backup');
     Route::resource('systems', SystemController::class);
 });
 
