@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
-import { store } from '@/routes/systems';
+import { show, store } from '@/routes/systems';
 
 import InputError from '@/components/InputError.vue';
 import { Input } from '@/components/ui/input';
@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { urlIsActive } from '@/lib/utils';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/vue3';
-import { MonitorCog, Plus } from 'lucide-vue-next';
+import { AppWindow, MonitorCog, Plus } from 'lucide-vue-next';
 import { toast } from 'vue-sonner';
 
 import { Button } from '@/components/ui/button';
@@ -163,6 +163,15 @@ const onSubmit = () => {
                             </form>
                         </DialogContent>
                     </Dialog>
+                </SidebarMenuButton>
+            </SidebarMenuItem>
+
+            <SidebarMenuItem v-for="system in page.props.systems" :key="system.name">
+                <SidebarMenuButton as-child :tooltip="system.name">
+                    <Link :href="show({ system: system.slug })">
+                        <AppWindow class="size-6" />
+                        <span>{{ system.name }}</span>
+                    </Link>
                 </SidebarMenuButton>
             </SidebarMenuItem>
         </SidebarMenu>

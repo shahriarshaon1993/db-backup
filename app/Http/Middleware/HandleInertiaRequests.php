@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\System;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -50,6 +51,13 @@ class HandleInertiaRequests extends Middleware
                 'success' => fn() => $request->session()->get('success'),
                 'error' => fn() => $request->session()->get('error'),
             ],
+            'systems' => System::query()
+                ->orderBy('name')->get()
+                ->map(fn($system): array => [
+                    'id' => $system->id,
+                    'name' => $system->name,
+                    'slug' => $system->slug,
+                ]),
             'sidebarOpen' => !$request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
     }
