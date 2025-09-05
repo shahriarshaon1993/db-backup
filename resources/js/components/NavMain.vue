@@ -1,11 +1,16 @@
 <script setup lang="ts">
+import SystemController from '@/actions/App/Http/Controllers/SystemController';
 import { SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
+
+import InputError from '@/components/InputError.vue';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { urlIsActive } from '@/lib/utils';
 import { type NavItem } from '@/types';
-import { Link, usePage } from '@inertiajs/vue3';
+import { Form, Link, usePage } from '@inertiajs/vue3';
 import { MonitorCog, Plus } from 'lucide-vue-next';
-import { Form } from '@inertiajs/vue3';
 
+import { Button } from '@/components/ui/button';
 import {
     Dialog,
     DialogClose,
@@ -16,8 +21,6 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
-import {Button} from "@/components/ui/button";
-import RegisteredUserController from "@/actions/App/Http/Controllers/Auth/RegisteredUserController";
 
 defineProps<{
     items: NavItem[];
@@ -45,21 +48,104 @@ const page = usePage();
                 <SidebarMenuButton>
                     <Dialog>
                         <DialogTrigger as-child>
-                            <button type="button" class="w-full cursor-pointer flex items-center justify-between">
+                            <button type="button" class="flex w-full cursor-pointer items-center justify-between">
                                 <div class="flex items-center gap-2">
-                                    <MonitorCog class="size-5"/>
+                                    <MonitorCog class="size-5" />
                                     Add System
                                 </div>
-                                <Plus class="size-5"/>
+                                <Plus class="size-5" />
                             </button>
                         </DialogTrigger>
                         <DialogContent>
                             <Form
                                 v-bind="SystemController.store.form()"
-                                v-slot="{ errors, processing }"
-                                class="flex flex-col gap-6"
+                                :options="{
+                                    preserveScroll: true,
+                                }"
+                                class="space-y-6"
+                                v-slot="{ errors, processing, reset, clearErrors }"
                             >
+                                <DialogHeader>
+                                    <DialogTitle>Add a system</DialogTitle>
+                                    <DialogDescription>Add a new system with there secret informations.</DialogDescription>
+                                </DialogHeader>
 
+                                <div class="mt-6 grid gap-6">
+                                    <div class="grid gap-2">
+                                        <Label for="name">System name</Label>
+                                        <Input
+                                            id="name"
+                                            type="text"
+                                            required
+                                            autofocus
+                                            :tabindex="1"
+                                            autocomplete="name"
+                                            name="name"
+                                            placeholder="System name"
+                                        />
+                                        <InputError :message="errors.name" />
+                                    </div>
+
+                                    <div class="grid gap-2">
+                                        <Label for="db_name">DB name</Label>
+                                        <Input id="db_name" type="text" name="db_name" placeholder="DB name" />
+                                        <InputError :message="errors.db_name" />
+                                    </div>
+
+                                    <div class="grid gap-2">
+                                        <Label for="db_host">DB Host</Label>
+                                        <Input
+                                            id="db_host"
+                                            type="text"
+                                            name="db_host"
+                                            placeholder="DB host"
+                                            default-value="127.0.0.1"
+                                        />
+                                        <InputError :message="errors.db_host" />
+                                    </div>
+
+                                    <div class="grid gap-2">
+                                        <Label for="db_port">DB port</Label>
+                                        <Input
+                                            id="db_port"
+                                            type="text"
+                                            name="db_port"
+                                            placeholder="DB port"
+                                            default-value="3306"
+                                        />
+                                        <InputError :message="errors.db_port" />
+                                    </div>
+
+                                    <div class="grid gap-2">
+                                        <Label for="db_username">DB username</Label>
+                                        <Input id="db_username" type="text" name="db_username" placeholder="DB username" />
+                                        <InputError :message="errors.db_username" />
+                                    </div>
+
+                                    <div class="grid gap-2">
+                                        <Label for="db_password">DB password</Label>
+                                        <Input id="db_password" type="text" name="db_password" placeholder="DB password" />
+                                        <InputError :message="errors.db_password" />
+                                    </div>
+                                </div>
+
+                                <DialogFooter class="gap-2">
+                                    <DialogClose as-child>
+                                        <Button
+                                            variant="secondary"
+                                            @click="
+                                                () => {
+                                                    clearErrors();
+                                                    reset();
+                                                }
+                                            "
+                                        >
+                                            Cancel
+                                        </Button>
+                                    </DialogClose>
+
+                                    <Button type="submit" :disabled="processing"> Save </Button>
+                                </DialogFooter>
                             </Form>
                         </DialogContent>
                     </Dialog>

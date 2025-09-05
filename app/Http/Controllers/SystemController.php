@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreSystemRequest;
 use Illuminate\Http\Request;
 
 class SystemController
 {
-    public function store(Request $request)
+    public function store(StoreSystemRequest $request)
     {
-        dd($request->input());
+        $attributes = $request->validated();
+
+        dd($attributes);
     }
 }
