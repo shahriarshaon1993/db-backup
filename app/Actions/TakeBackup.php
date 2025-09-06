@@ -12,9 +12,10 @@ class TakeBackup
     public function handle(System $system): Backup
     {
         $timestamp = now()->format('Y_m_d_His');
-        $fileName = "{$system->slug}_{$timestamp}.sql.gz";
+        $fileName = "{$system->slug}_{$timestamp}";
+        $fileNameExt = "{$fileName}.sql.gz";
         $directory = "backups/{$system->id}";
-        $storagePath = "{$directory}/{$fileName}";
+        $storagePath = "{$directory}/{$fileNameExt}";
         $fullPath = storage_path("app/{$storagePath}");
 
         if (!is_dir(storage_path("app/{$directory}"))) {

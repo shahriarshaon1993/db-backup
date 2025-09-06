@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\CreateSystem;
 use App\Actions\TakeBackup;
 use App\Http\Requests\StoreSystemRequest;
+use App\Http\Resources\SystemResource;
 use App\Models\System;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
@@ -21,8 +22,10 @@ class SystemController
 
     public function show(System $system): Response
     {
+        $system = $system->load(['backups', 'createdBy']);
+
         return Inertia::render('systems/Create', [
-            'system' => $system,
+            'system' => new SystemResource($system),
         ]);
     }
 

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import BackupTable from '@/components/app/BackupTable.vue';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { dashboard } from '@/routes';
@@ -51,14 +52,23 @@ const onBackup = () => {
     <Head title="System" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="flex justify-between gap-4 rounded-xl p-4">
-            <h3 class="mb-0.5 text-base font-medium">{{ system.name }}</h3>
-            <div>
-                <Button class="cursor-pointer" @click="onBackup">
-                    <Download />
-                    <span>Create Backup</span>
-                </Button>
+        <div class="hidden h-full flex-1 flex-col space-y-8 p-8 md:flex">
+            <div class="flex items-center justify-between space-y-2">
+                <div>
+                    <h3 class="text-2xl font-bold tracking-tight">{{ system.name }}</h3>
+                    <p class="text-muted-foreground">
+                        Here's a list of your <b>{{ system.name }}</b> database backups!
+                    </p>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <Button class="cursor-pointer" @click="onBackup">
+                        <Download />
+                        <span>Take Backup</span>
+                    </Button>
+                </div>
             </div>
+
+            <BackupTable :backups="system.backups" />
         </div>
     </AppLayout>
 </template>
