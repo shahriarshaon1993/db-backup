@@ -28,7 +28,6 @@ class SystemResource extends JsonResource
             'db_password' => $this->db_password,
             'created_by' => $this->createdBy->name,
             'created_at' => $this->created_at->format('Y-d-m'),
-            'backups' => BackupResource::collection($this->whenLoaded('backups'))
         ];
     }
 }

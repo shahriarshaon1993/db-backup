@@ -22,4 +22,17 @@ class Backup extends Model
     {
         return $this->hasMany(System::class);
     }
+
+    public function scopeSearch($query, ?string $search)
+    {
+        if (!$search)
+            return $query;
+
+        $search = "%{$search}%";
+
+        return $query->where(
+            fn($q) =>
+            $q->where('file_name', 'like', $search)
+        );
+    }
 }

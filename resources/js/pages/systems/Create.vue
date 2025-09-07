@@ -11,6 +11,8 @@ import { toast } from 'vue-sonner';
 
 interface Props {
     system: Object;
+    backups: Object;
+    filters: Object;
 }
 
 const props = defineProps<Props>();
@@ -68,7 +70,7 @@ const onBackup = () => {
                 </div>
             </div>
 
-            <BackupTable :backups="system.backups" />
+            <BackupTable :backups="backups" :system-slug="system.slug" :filters="filters" />
         </div>
     </AppLayout>
 </template>
