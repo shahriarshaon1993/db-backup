@@ -4,6 +4,7 @@ import TableDataNotFound from '@/components/app/TableDataNotFound.vue';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
+import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { show } from '@/routes/systems';
 import { router } from '@inertiajs/vue3';
@@ -63,6 +64,17 @@ const updateFilters = () => {
     );
 };
 
+const changePage = (page: number) => {
+    router.get(
+        show({ system: props.systemSlug }),
+        { page: page },
+        {
+            preserveState: true,
+            preserveScroll: true,
+        },
+    );
+};
+
 const deleteSelected = () => {};
 </script>
 
@@ -96,7 +108,7 @@ const deleteSelected = () => {};
 
                     <TableBody>
                         <template v-if="backups.data.length > 0">
-                            <TableRow v-for="backup in backups.data" :key="backup.file_name">
+                            <TableRow v-for="backup in backups.data" :key="backup.id">
                                 <TableCell>
                                     <Checkbox :model-value="selectedRows.includes(backup.id)" @update:model-value="toggleRow(backup.id)" />
                                 </TableCell>
@@ -111,6 +123,46 @@ const deleteSelected = () => {};
                         <TableDataNotFound v-else :length="6" />
                     </TableBody>
                 </Table>
+            </div>
+        </div>
+
+        <div class="flex items-center justify-between px-2">
+            <div class="flex-1 text-sm text-muted-foreground">{{ backups.meta.to }} of {{ backups.meta.total }} row(s) selected.</div>
+            <div class="flex items-center space-x-6 lg:space-x-8">
+                <div class="flex items-center space-x-2">
+                    <p class="text-sm font-medium">Rows per page</p>
+                    <Button variant="outline">10</Button>
+                </div>
+                <div class="flex w-[100px] items-center justify-center text-sm font-medium">
+                    Page {{ backups.meta.current_page }} of {{ backups.meta.last_page }}
+                </div>
+                <div class="flex items-center space-x-2">
+                    <Pagination
+                        v-slot="{ page }"
+                        :items-per-page="backups.meta.per_page"
+                        :total="backups.meta.total"
+                        :default-page="backups.meta.current_page"
+                    >
+                        <PaginationContent v-slot="{ items }">
+                            <PaginationPrevious :disabled="!backups.links?.prev" @click="changePage(backups.meta.current_page - 1)" />
+
+                            <template v-for="(item, index) in items" :key="`page-${index}`">
+                                <PaginationItem
+                                    v-if="item.type === 'page'"
+                                    :value="item.value"
+                                    :is-active="item.value === page"
+                                    @click="changePage(item.value)"
+                                >
+                                    {{ item.value }}
+                                </PaginationItem>
+
+                                <PaginationEllipsis v-else />
+                            </template>
+
+                            <PaginationNext :disabled="!backups.links?.next" @click="changePage(backups.meta.current_page + 1)" />
+                        </PaginationContent>
+                    </Pagination>
+                </div>
             </div>
         </div>
     </div>
