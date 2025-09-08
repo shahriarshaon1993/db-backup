@@ -7,10 +7,12 @@ import { Input } from '@/components/ui/input';
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { destroy } from '@/routes/backups';
 import { show } from '@/routes/systems';
-import { router } from '@inertiajs/vue3';
+import { router, usePage } from '@inertiajs/vue3';
 import { debounce } from 'lodash';
 import { computed, reactive, ref, watch } from 'vue';
+import { toast } from 'vue-sonner';
 
 interface Props {
     backups: Object;
@@ -20,6 +22,8 @@ interface Props {
 
 const props = defineProps<Props>();
 const selectedRows = ref<number[]>([]);
+
+const page = usePage();
 
 const appFilters = reactive({
     search: props.filters?.search ?? '',
@@ -88,7 +92,24 @@ const changePage = (page: number) => {
     );
 };
 
-const deleteSelected = () => {};
+const deleteSelected = () => {
+    if (selectedRows.value.length > 0) {
+        router.delete(destroy(), {
+            data: { ids: selectedRows.value },
+            preserveState: true,
+            onSuccess: () => {
+                selectedRows.value = [];
+                toast('Success!', {
+                    description: page.props.flash.success,
+                    action: {
+                        label: 'Undo',
+                        onClick: () => console.log('Undo'),
+                    },
+                });
+            },
+        });
+    }
+};
 </script>
 
 <template>
