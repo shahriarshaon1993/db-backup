@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { show } from '@/routes/systems';
 import { router } from '@inertiajs/vue3';
@@ -22,6 +23,7 @@ const selectedRows = ref<number[]>([]);
 
 const appFilters = reactive({
     search: props.filters?.search ?? '',
+    per_page: props.filters?.per_page ?? '',
 });
 
 const refresh = debounce(() => {
@@ -54,14 +56,25 @@ const toggleRow = (id: number) => {
 };
 
 const updateFilters = () => {
-    router.get(
-        show({ system: props.systemSlug }),
-        { search: appFilters.search },
-        {
-            preserveState: true,
-            preserveScroll: true,
-        },
-    );
+    const params = {};
+
+    if (appFilters.per_page) {
+        params.per_page = appFilters.per_page;
+    }
+
+    if (appFilters.search) {
+        params.search = appFilters.search;
+    }
+
+    router.get(show({ system: props.systemSlug }), params, {
+        preserveState: true,
+        preserveScroll: true,
+    });
+};
+
+const updatePerPage = (value: string): void => {
+    appFilters.per_page = parseInt(value);
+    updateFilters();
 };
 
 const changePage = (page: number) => {
@@ -131,7 +144,17 @@ const deleteSelected = () => {};
             <div class="flex items-center space-x-6 lg:space-x-8">
                 <div class="flex items-center space-x-2">
                     <p class="text-sm font-medium">Rows per page</p>
-                    <Button variant="outline">10</Button>
+                    <Select v-model="appFilters.per_page" @update:modelValue="updatePerPage">
+                        <SelectTrigger class="w-[80px]">
+                            <SelectValue :placeholder="appFilters.per_page" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="15">15</SelectItem>
+                            <SelectItem value="25">25</SelectItem>
+                            <SelectItem value="50">50</SelectItem>
+                            <SelectItem value="100">100</SelectItem>
+                        </SelectContent>
+                    </Select>
                 </div>
                 <div class="flex w-[100px] items-center justify-center text-sm font-medium">
                     Page {{ backups.meta.current_page }} of {{ backups.meta.last_page }}
