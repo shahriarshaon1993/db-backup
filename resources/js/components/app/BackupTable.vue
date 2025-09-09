@@ -122,8 +122,6 @@ const handleDownload = (id: number) => {
         <div class="flex flex-1 items-center space-x-2">
             <div class="flex flex-1 items-center space-x-2">
                 <Input v-model="appFilters.search" type="text" placeholder="Search..." class="w-[150px] lg:w-[250px]" />
-                <Button variant="outline">Status</Button>
-                <Button variant="outline">Priority</Button>
             </div>
 
             <DestroySelectedItemDialog :length="selectedRows.length" @on-destroy="deleteSelected" />
