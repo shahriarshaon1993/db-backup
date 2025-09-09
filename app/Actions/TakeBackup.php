@@ -13,7 +13,7 @@ class TakeBackup
     {
         $timestamp = now()->format('Y_m_d_His');
         $fileName = "{$system->slug}_{$timestamp}";
-        $fileNameExt = "{$fileName}.sql.gz";
+        $fileNameExt = "{$fileName}.zip";
         $directory = "backups/{$system->id}";
         $storagePath = "{$directory}/{$fileNameExt}";
         $fullPath = storage_path("app/{$storagePath}");
@@ -22,6 +22,10 @@ class TakeBackup
             mkdir(storage_path("app/{$directory}"), 0755, true);
         }
 
+        // Temporary SQL dump path
+        $tempSqlPath = storage_path("app/{$directory}/{$fileName}.sql");
+
+        // Generate SQL dump
         $process = new Process([
             'mysqldump',
             '-h',
@@ -35,9 +39,9 @@ class TakeBackup
         ]);
 
         $process->setTimeout(3600);
-        $process->run(function ($type, $buffer) use ($fullPath) {
+        $process->run(function ($type, $buffer) use ($tempSqlPath) {
             if ($type === Process::OUT) {
-                file_put_contents($fullPath, gzencode($buffer), FILE_APPEND);
+                file_put_contents($tempSqlPath, $buffer, FILE_APPEND);
             }
         });
 
@@ -45,9 +49,20 @@ class TakeBackup
             throw new \RuntimeException("Backup failed: " . $process->getErrorOutput());
         }
 
+        // Create Zip file
+        $zip = new \ZipArchive();
+        if ($zip->open($fullPath, \ZipArchive::CREATE) !== true) {
+            throw new \RuntimeException("Cannot create zip file at: $fullPath");
+        }
+
+        $zip->addFile($tempSqlPath, basename($tempSqlPath));
+        $zip->close();
+
+        unlink($tempSqlPath);
+
         return Backup::create([
             'system_id' => $system->id,
-            'file_name' => $fileName,
+            'file_name' => $fileNameExt, // zip file name
             'file_path' => $storagePath,
             'storage_type' => 'local',
             'file_size' => filesize($fullPath),

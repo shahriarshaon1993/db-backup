@@ -34,7 +34,7 @@ const handleDestroy = () => {
     <AlertDialog v-model:open="isOpen">
         <!-- Trigger: A button to open the dialog -->
         <AlertDialogTrigger as-child>
-            <Button :disabled="length === 0" variant="destructive">
+            <Button :disabled="length === 0" variant="destructive" class="cursor-pointer">
                 <Trash2 class="h-4 w-4" />
                 ({{ length }})
             </Button>

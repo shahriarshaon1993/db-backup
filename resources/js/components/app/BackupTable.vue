@@ -11,6 +11,7 @@ import { destroy } from '@/routes/backups';
 import { show } from '@/routes/systems';
 import { router, usePage } from '@inertiajs/vue3';
 import { debounce } from 'lodash';
+import { Download } from 'lucide-vue-next';
 import { computed, reactive, ref, watch } from 'vue';
 import { toast } from 'vue-sonner';
 
@@ -27,7 +28,7 @@ const page = usePage();
 
 const appFilters = reactive({
     search: props.filters?.search ?? '',
-    per_page: props.filters?.per_page ?? '',
+    per_page: props.filters?.per_page ?? 15,
 });
 
 const refresh = debounce(() => {
@@ -110,6 +111,10 @@ const deleteSelected = () => {
         });
     }
 };
+
+const handleDownload = (id: number) => {
+    window.location.href = `/backups/${id}/download`;
+};
 </script>
 
 <template>
@@ -150,7 +155,11 @@ const deleteSelected = () => {
                                 <TableCell>{{ backup.storage_type }}</TableCell>
                                 <TableCell>{{ backup.file_size }}</TableCell>
                                 <TableCell>{{ backup.created_at }}</TableCell>
-                                <TableCell> Download </TableCell>
+                                <TableCell>
+                                    <Button type="button" size="sm" variant="secondary" class="cursor-pointer" @click="handleDownload(backup.id)">
+                                        <Download />
+                                    </Button>
+                                </TableCell>
                             </TableRow>
                         </template>
 
@@ -167,7 +176,7 @@ const deleteSelected = () => {
                     <p class="text-sm font-medium">Rows per page</p>
                     <Select v-model="appFilters.per_page" @update:modelValue="updatePerPage">
                         <SelectTrigger class="w-[80px]">
-                            <SelectValue :placeholder="appFilters.per_page" />
+                            <SelectValue :placeholder="String(appFilters.per_page)" />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="15">15</SelectItem>

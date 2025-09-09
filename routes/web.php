@@ -18,7 +18,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('systems.backup');
     Route::resource('systems', SystemController::class);
 
-    Route::delete('backups/destroy', [BackupController::class, 'destroy'])->name('backups.destroy');
+    Route::get('/backups/{backup}/download', [BackupController::class, 'download'])
+        ->name('backups.download');
+    Route::delete('backups/destroy', [BackupController::class, 'destroy'])
+        ->name('backups.destroy');
 });
 
 require __DIR__ . '/settings.php';
