@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Actions\CreateSystem;
 use App\Actions\GetSystemBackups;
-use App\Actions\TakeBackup;
 use App\Http\Requests\StoreSystemRequest;
 use App\Http\Resources\BackupResource;
 use App\Http\Resources\SystemResource;
