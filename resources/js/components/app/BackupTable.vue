@@ -145,7 +145,7 @@ const handleDownload = (id: number) => {
 
                     <TableBody>
                         <template v-if="backups.data.length > 0">
-                            <TableRow v-for="backup in backups.data" :key="backup.id">
+                            <TableRow v-for="backup in backups.data" :key="backup.id" @click="toggleRow(backup.id)" class="cursor-pointer">
                                 <TableCell>
                                     <Checkbox :model-value="selectedRows.includes(backup.id)" @update:model-value="toggleRow(backup.id)" />
                                 </TableCell>
@@ -168,7 +168,7 @@ const handleDownload = (id: number) => {
         </div>
 
         <div class="flex items-center justify-between px-2">
-            <div class="flex-1 text-sm text-muted-foreground">{{ backups.meta.to }} of {{ backups.meta.total }} row(s) selected.</div>
+            <div class="flex-1 text-sm text-muted-foreground">{{ selectedRows.length }} of {{ backups.meta.total }} row(s) selected.</div>
             <div class="flex items-center space-x-6 lg:space-x-8">
                 <div class="flex items-center space-x-2">
                     <p class="text-sm font-medium">Rows per page</p>

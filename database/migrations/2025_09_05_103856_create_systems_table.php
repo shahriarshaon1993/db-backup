@@ -20,6 +20,7 @@ return new class extends Migration {
             $table->string('db_password')->nullable();
             $table->string('db_name');
             $table->foreignId('created_by')->constrained('users');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

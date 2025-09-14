@@ -7,6 +7,7 @@ import { backup } from '@/routes/systems';
 import { type BreadcrumbItem } from '@/types';
 import { Head, router, usePage } from '@inertiajs/vue3';
 import { Download } from 'lucide-vue-next';
+import { ref } from 'vue';
 import { toast } from 'vue-sonner';
 
 interface Props {
@@ -19,6 +20,8 @@ const props = defineProps<Props>();
 
 const page = usePage();
 
+const isDownload = ref(false);
+
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'System',
@@ -27,12 +30,14 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 const onBackup = () => {
+    isDownload.value = true;
     router.get(
         backup({ system: props.system.slug }),
         {},
         {
             preserveScroll: true,
             onSuccess: () => {
+                isDownload.value = false;
                 toast('Success!', {
                     description: page.props.flash.success,
                     action: {
@@ -42,6 +47,7 @@ const onBackup = () => {
                 });
             },
             onError: (errors) => {
+                isDownload.value = false;
                 toast.error('Backup failed!');
                 console.error(errors);
             },
@@ -63,9 +69,10 @@ const onBackup = () => {
                     </p>
                 </div>
                 <div class="flex items-center space-x-2">
-                    <Button class="cursor-pointer" @click="onBackup">
+                    <Button class="cursor-pointer" @click="onBackup" :disabled="isDownload">
                         <Download />
-                        <span>Take Backup</span>
+                        <span v-if="isDownload">Loading...</span>
+                        <span v-else>Take Backup</span>
                     </Button>
                 </div>
             </div>

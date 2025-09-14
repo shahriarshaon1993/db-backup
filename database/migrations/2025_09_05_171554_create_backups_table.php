@@ -17,6 +17,7 @@ return new class extends Migration {
             $table->string('storage_type')->default('local');
             $table->bigInteger('file_size')->nullable();
             $table->foreignId('system_id')->constrained()->cascadeOnDelete();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

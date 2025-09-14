@@ -8,6 +8,7 @@ use App\Actions\TakeBackup;
 use App\Http\Requests\StoreSystemRequest;
 use App\Http\Resources\BackupResource;
 use App\Http\Resources\SystemResource;
+use App\Jobs\TakeDatabaseBackupJob;
 use App\Models\System;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -39,13 +40,12 @@ class SystemController
         ]);
     }
 
-    public function backup(System $system, TakeBackup $action): RedirectResponse
+    public function backup(System $system): RedirectResponse
     {
-        $backup = $action->handle($system);
+        TakeDatabaseBackupJob::dispatch($system);
 
         return back()->with([
             'success' => 'Backup created successfully',
-            'backup' => $backup
         ]);
     }
 }

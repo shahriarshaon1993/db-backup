@@ -5,6 +5,7 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * @property int $id,
@@ -18,6 +19,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class Backup extends Model
 {
+    use SoftDeletes;
+
     public function systems(): HasMany
     {
         return $this->hasMany(System::class);
